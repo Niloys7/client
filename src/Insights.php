@@ -1,6 +1,6 @@
 <?php
 
-namespace Appsero;
+namespace NS7_UT;
 
 /**
  * Appsero Insights
@@ -33,7 +33,7 @@ class Insights {
     protected $extra_data = array();
 
     /**
-     * AppSero\Client
+     * NS7_UT\Client
      *
      * @var object
      */
@@ -58,7 +58,7 @@ class Insights {
             $client = new Client( $client, $name, $file );
         }
 
-        if ( is_object( $client ) && is_a( $client, 'Appsero\Client' ) ) {
+        if ( is_object( $client ) && is_a( $client, 'NS7_UT\Client' ) ) {
             $this->client = $client;
         }
     }
@@ -375,7 +375,7 @@ class Insights {
             $is_local = true;
         }
 
-        return apply_filters( 'appsero_is_local', $is_local );
+        return apply_filters( 'cdx_is_local', $is_local );
     }
 
     /**
@@ -430,16 +430,16 @@ class Insights {
             $notice = $this->notice;
         }
 
-        $policy_url = 'https://appsero.com/privacy-policy/';
+        $policy_url = 'https://www.codeixer.com/docs/enabling-usage-tracking/';
 
         $notice .= ' (<a class="' . $this->client->slug . '-insights-data-we-collect" href="#">' . $this->client->__trans( 'what we collect' ) . '</a>)';
         $notice .= '<p class="description" style="display:none;">' . implode( ', ', $this->data_we_collect() ) . '. ';
-        $notice .= 'We are using Appsero to collect your data. <a href="' . $policy_url . '" target="_blank">Learn more</a> about how Appsero collects and handle your data.</p>';
+        $notice .= '<a href="' . $policy_url . '" target="_blank">Learn more</a></p>';
 
         echo '<div class="updated"><p>';
         echo wp_kses_post( $notice );
         echo '</p><p class="submit">';
-        echo '&nbsp;<a href="' . esc_url( $optin_url ) . '" class="button-primary button-large">' . esc_html( $this->client->__trans( 'Allow' ) ) . '</a>';
+        echo '&nbsp;<a href="' . esc_url( $optin_url ) . '" class="button-primary button-large">' . esc_html( $this->client->__trans( 'Sure! I\'d love to help' ) ) . '</a>';
         echo '&nbsp;<a href="' . esc_url( $optout_url ) . '" class="button-secondary button-large">' . esc_html( $this->client->__trans( 'No thanks' ) ) . '</a>';
         echo '</p></div>';
 
@@ -886,7 +886,7 @@ class Insights {
 
         $this->deactivation_modal_styles();
         $reasons        = $this->get_uninstall_reasons();
-        $custom_reasons = apply_filters( 'appsero_custom_deactivation_reasons', [], $this->client );
+        $custom_reasons = apply_filters( 'cdx_custom_deactivation_reasons', [], $this->client );
         ?>
 
         <div class="wd-dr-modal" id="<?php echo $this->client->slug; ?>-wd-dr-modal">
@@ -924,9 +924,9 @@ class Insights {
                     <p class="wd-dr-modal-reasons-bottom">
                         <?php
                         echo sprintf(
-                            $this->client->__trans( 'We share your data with <a href="%1$s" target="_blank">Appsero</a> to troubleshoot problems &amp; make product improvements. <a href="%2$s" target="_blank">Learn more</a> about how Appsero handles your data.' ),
-                            esc_url( 'https://appsero.com/' ),
-                            esc_url( 'https://appsero.com/privacy-policy' )
+                            $this->client->__trans( 'We collect your data to troubleshoot problems &amp; make product improvements. <a href="%1$s" target="_blank">Learn more</a> about how we handles your data.' ),
+                           
+                            esc_url( 'https://www.codeixer.com/docs/enabling-usage-tracking/' )
                         );
                         ?>
                     </p>

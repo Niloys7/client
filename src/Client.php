@@ -1,7 +1,10 @@
 <?php
 
-namespace Appsero;
+namespace NS7_UT;
 
+if ( class_exists( '\NS7_UT\Client' ) ) {
+	return;
+}
 /**
  * Appsero Client
  *
@@ -9,270 +12,279 @@ namespace Appsero;
  */
 class Client {
 
-    /**
-     * The client version
-     *
-     * @var string
-     */
-    public $version = '2.0.4';
+	/**
+	 * The client version
+	 *
+	 * @var string
+	 */
+	public $version = '2.0.4';
 
-    /**
-     * Hash identifier of the plugin
-     *
-     * @var string
-     */
-    public $hash;
+	/**
+	 * Hash identifier of the plugin
+	 *
+	 * @var string
+	 */
+	public $hash;
 
-    /**
-     * Name of the plugin
-     *
-     * @var string
-     */
-    public $name;
+	/**
+	 * Name of the plugin
+	 *
+	 * @var string
+	 */
+	public $name;
 
-    /**
-     * The plugin/theme file path
-     *
-     * @example .../wp-content/plugins/test-slug/test-slug.php
-     *
-     * @var string
-     */
-    public $file;
+	/**
+	 * The plugin/theme file path
+	 *
+	 * @example .../wp-content/plugins/test-slug/test-slug.php
+	 *
+	 * @var string
+	 */
+	public $file;
 
-    /**
-     * Main plugin file
-     *
-     * @example test-slug/test-slug.php
-     *
-     * @var string
-     */
-    public $basename;
+	/**
+	 * Main plugin file
+	 *
+	 * @example test-slug/test-slug.php
+	 *
+	 * @var string
+	 */
+	public $basename;
 
-    /**
-     * Slug of the plugin
-     *
-     * @example test-slug
-     *
-     * @var string
-     */
-    public $slug;
+	/**
+	 * Slug of the plugin
+	 *
+	 * @example test-slug
+	 *
+	 * @var string
+	 */
+	public $slug;
 
-    /**
-     * The project version
-     *
-     * @var string
-     */
-    public $project_version;
+	/**
+	 * The project version
+	 *
+	 * @var string
+	 */
+	public $project_version;
 
-    /**
-     * The project type
-     *
-     * @var string
-     */
-    public $type;
+	/**
+	 * The project type
+	 *
+	 * @var string
+	 */
+	public $type;
 
-    /**
-     * Textdomain
-     *
-     * @var string
-     */
-    public $textdomain;
+	/**
+	 * Textdomain
+	 *
+	 * @var string
+	 */
+	public $textdomain;
 
-    /**
-     * The Object of Insights Class
-     *
-     * @var object
-     */
-    private $insights;
+	/**
+	 * The Object of Insights Class
+	 *
+	 * @var object
+	 */
+	private $insights;
 
-    /**
-     * The Object of License Class
-     *
-     * @var object
-     */
-    private $license;
+	/**
+	 * The Object of License Class
+	 *
+	 * @var object
+	 */
+	private $license;
 
-    /**
-     * Initialize the class
-     *
-     * @param string $hash hash of the plugin
-     * @param string $name readable name of the plugin
-     * @param string $file main plugin file path
-     */
-    public function __construct( $hash, $name, $file ) {
-        $this->hash = $hash;
-        $this->name = $name;
-        $this->file = $file;
+	/**
+	 * The API Endpoint
+	 *
+	 * @var string
+	 */
+	public $endpoint = 'https://codeixer.com/wp-json/cdx/v1/';
 
-        $this->set_basename_and_slug();
-    }
+	/**
+	 * Client constructor.
+	 *
+	 * @param string $hash
+	 * @param string $name
+	 * @param string $file
+	 */
+	public function __construct( $hash, $name, $file ) {
+		$this->hash = $hash;
+		$this->name = $name;
+		$this->file = $file;
 
-    /**
-     * Initialize insights class
-     *
-     * @return Appsero\Insights
-     */
-    public function insights() {
-        if ( ! class_exists( __NAMESPACE__ . '\Insights' ) ) {
-            require_once __DIR__ . '/Insights.php';
-        }
+		$this->set_basename_and_slug();
+	}
 
-        // if already instantiated, return the cached one
-        if ( $this->insights ) {
-            return $this->insights;
-        }
+	/**
+	 * Initialize insights class
+	 *
+	 * @return Appsero\Insights
+	 */
+	public function insights() {
+		if ( ! class_exists( __NAMESPACE__ . '\Insights' ) ) {
+			require_once __DIR__ . '/Insights.php';
+		}
 
-        $this->insights = new Insights( $this );
+		// if already instantiated, return the cached one
+		if ( $this->insights ) {
+			return $this->insights;
+		}
 
-        return $this->insights;
-    }
+		$this->insights = new Insights( $this );
 
-    /**
-     * Initialize plugin/theme updater
-     *
-     * @return void
-     */
-    public function updater() {
-        // do not show update notice on ajax request and rest api request
-        if ( wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-            return;
-        }
+		return $this->insights;
+	}
 
-        // show deprecated notice
-        _deprecated_function( __CLASS__ . '::updater', '2.0', '\Appsero\Updater::init($client);, for more details please visit: https://appsero.com/docs/appsero-developers-guide/appsero-client/appsero-sdk-updater-changes/' );
+	/**
+	 * NOTE -  Not WOrking
+	 * Initialize plugin/theme updater
+	 *
+	 * @return void
+	 */
+	public function updater() {
+		// do not show update notice on ajax request and rest api request
+		if ( wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
 
-        // initialize the new updater
-        if ( method_exists( '\Appsero\Updater', 'init' ) ) {
-            \Appsero\Updater::init( $this );
-        }
-    }
+		// show deprecated notice
+		_deprecated_function( __CLASS__ . '::updater', '2.0', '\Appsero\Updater::init($client);, for more details please visit: https://appsero.com/docs/appsero-developers-guide/appsero-client/appsero-sdk-updater-changes/' );
 
-    /**
-     * Initialize license checker
-     *
-     * @return Appsero\License
-     */
-    public function license() {
-        if ( ! class_exists( __NAMESPACE__ . '\License' ) ) {
-            require_once __DIR__ . '/License.php';
-        }
+		// initialize the new updater
+		if ( method_exists( '\Appsero\Updater', 'init' ) ) {
+			\Appsero\Updater::init( $this );
+		}
+	}
 
-        // if already instantiated, return the cached one
-        if ( $this->license ) {
-            return $this->license;
-        }
+	/**
+	 * NOTE -  Not WOrking
+	 * Initialize license checker
+	 *
+	 * @return Appsero\License
+	 */
+	public function license() {
+		if ( ! class_exists( __NAMESPACE__ . '\License' ) ) {
+			require_once __DIR__ . '/License.php';
+		}
 
-        $this->license = new License( $this );
+		// if already instantiated, return the cached one
+		if ( $this->license ) {
+			return $this->license;
+		}
 
-        return $this->license;
-    }
+		$this->license = new License( $this );
 
-    /**
-     * API Endpoint
-     *
-     * @return string
-     */
-    public function endpoint() {
-        $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+		return $this->license;
+	}
 
-        return trailingslashit( $endpoint );
-    }
+	/**
+	 * API Endpoint
+	 *
+	 * @return string
+	 */
+	public function endpoint() {
 
-    /**
-     * Set project basename, slug and version
-     *
-     * @return void
-     */
-    protected function set_basename_and_slug() {
-        if ( strpos( $this->file, WP_CONTENT_DIR . '/themes/' ) === false ) {
-            $this->basename = plugin_basename( $this->file );
+		return trailingslashit( $this->endpoint );
+	}
 
-            list( $this->slug, $mainfile ) = explode( '/', $this->basename );
+	/**
+	 * Set project basename, slug and version
+	 *
+	 * @return void
+	 */
+	protected function set_basename_and_slug() {
+		if ( strpos( $this->file, WP_CONTENT_DIR . '/themes/' ) === false ) {
+			$this->basename = plugin_basename( $this->file );
 
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			list( $this->slug, $mainfile ) = explode( '/', $this->basename );
 
-            $plugin_data = get_plugin_data( $this->file, false, false );
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-            $this->project_version = $plugin_data['Version'];
-            $this->type            = 'plugin';
-        } else {
-            $this->basename = str_replace( WP_CONTENT_DIR . '/themes/', '', $this->file );
+			$plugin_data = get_plugin_data( $this->file, false, false );
 
-            list( $this->slug, $mainfile ) = explode( '/', $this->basename );
+			$this->project_version = $plugin_data['Version'];
+			$this->type            = 'plugin';
+		} else {
+			$this->basename = str_replace( WP_CONTENT_DIR . '/themes/', '', $this->file );
 
-            $theme = wp_get_theme( $this->slug );
+			list( $this->slug, $mainfile ) = explode( '/', $this->basename );
 
-            $this->project_version = $theme->version;
-            $this->type            = 'theme';
-        }
+			$theme = wp_get_theme( $this->slug );
 
-        $this->textdomain = $this->slug;
-    }
+			$this->project_version = $theme->version;
+			$this->type            = 'theme';
+		}
 
-    /**
-     * Send request to remote endpoint
-     *
-     * @param array  $params
-     * @param string $route
-     *
-     * @return array|WP_Error array of results including HTTP headers or WP_Error if the request failed
-     */
-    public function send_request( $params, $route, $blocking = false ) {
-        $url = $this->endpoint() . $route;
+		$this->textdomain = $this->slug;
+	}
 
-        $headers = [
-            'user-agent' => 'Appsero/' . md5( esc_url( home_url() ) ) . ';',
-            'Accept'     => 'application/json',
-        ];
+	/**
+	 * Send request to remote endpoint
+	 *
+	 * @param array  $params
+	 * @param string $route
+	 *
+	 * @return array|WP_Error array of results including HTTP headers or WP_Error if the request failed
+	 */
+	public function send_request( $params, $route, $blocking = false ) {
+		$url = $this->endpoint() . $route;
 
-        $response = wp_remote_post(
-            $url,
-            [
-                'method'      => 'POST',
-                'timeout'     => 30,
-                'redirection' => 5,
-                'httpversion' => '1.0',
-                'blocking'    => $blocking,
-                'headers'     => $headers,
-                'body'        => array_merge( $params, [ 'client' => $this->version ] ),
-                'cookies'     => [],
-            ]
-        );
+		$headers = array(
+			'user-agent' => 'Cdxr/' . md5( esc_url( home_url() ) ) . ';',
+			'Accept'     => 'application/json',
 
-        return $response;
-    }
+		);
 
-    /**
-     * Check if the current server is localhost
-     *
-     * @return bool
-     */
-    public function is_local_server() {
-        $is_local = isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], [ '127.0.0.1', '::1' ], true );
+		$response = wp_remote_post(
+			$url,
+			array(
+				'method'      => 'POST',
+				'timeout'     => 30,
+				'redirection' => 5,
+				'httpversion' => '1.0',
+				'blocking'    => $blocking,
+				'headers'     => $headers,
+				'body'        => array_merge( $params, array( 'client' => $this->version ) ),
+				'cookies'     => array(),
+			)
+		);
 
-        return apply_filters( 'appsero_is_local', $is_local );
-    }
+		return $response;
+	}
 
-    /**
-     * Translate function _e()
-     */
+	/**
+	 * Check if the current server is localhost
+	 *
+	 * @return bool
+	 */
+	public function is_local_server() {
+		$is_local = isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '::1' ), true );
+
+		return apply_filters( 'cdx_is_local', $is_local );
+	}
+
+	/**
+	 * Translate function _e()
+	 */
     // phpcs:ignore
     public function _etrans( $text ) {
-        call_user_func( '_e', $text, $this->textdomain );
-    }
+		call_user_func( '_e', $text, $this->textdomain );
+	}
 
-    /**
-     * Translate function __()
-     */
+	/**
+	 * Translate function __()
+	 */
     // phpcs:ignore
     public function __trans( $text ) {
-        return call_user_func( '__', $text, $this->textdomain );
-    }
+		return call_user_func( '__', $text, $this->textdomain );
+	}
 
-    /**
-     * Set project textdomain
-     */
-    public function set_textdomain( $textdomain ) {
-        $this->textdomain = $textdomain;
-    }
+	/**
+	 * Set project textdomain
+	 */
+	public function set_textdomain( $textdomain ) {
+		$this->textdomain = $textdomain;
+	}
 }

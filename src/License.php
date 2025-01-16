@@ -1,6 +1,6 @@
 <?php
 
-namespace Appsero;
+namespace NS7_UT;
 
 /**
  * Appsero License Checker
@@ -10,7 +10,7 @@ namespace Appsero;
 class License {
 
     /**
-     * AppSero\Client
+     * NS7_UT\Client
      *
      * @var object
      */
