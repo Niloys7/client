@@ -44,7 +44,7 @@ class Insights {
      *
      * @var bool
      */
-    private $plugin_data = false;
+    private $plugin_data = true;
 
     /**
      * Initialize the class
